@@ -465,8 +465,16 @@ export default function App() {
                             const link = getConfirmationWALink({ ...formData, product: activeProduct?.name || STAR_SET.name, price: formatPrice(totalPrice, selectedCountry), country: selectedCountry.name });
                             window.open(link, '_blank');
                         }}
-                        className="btn-premium h-24"
-                    > CONFIRMAR PEDIDO <ArrowRight size={20} /> </button>
+                        className="btn-premium h-24 flex items-center justify-center gap-4"
+                    > 
+                        CONFIRMAR PEDIDO 
+                        <img 
+                            src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+                            alt="WhatsApp" 
+                            className="w-6 h-6 brightness-0 invert"
+                            referrerPolicy="no-referrer"
+                        />
+                    </button>
                 </div>
             </motion.div>
           </>
@@ -513,12 +521,17 @@ export default function App() {
       {/* WHATSAPP FLOATING */}
       <button 
         onClick={() => window.open(`https://wa.me/${WA_SALES}`, '_blank')}
-        className="fixed bottom-24 right-6 md:bottom-12 md:right-12 z-[150] w-16 h-16 bg-luxury-black text-white flex items-center justify-center rounded-full shadow-2xl hover:bg-gold transition-all active:scale-90 group"
+        className="fixed bottom-24 right-6 md:bottom-12 md:right-12 z-[150] w-16 h-16 bg-[#25D366] text-white flex items-center justify-center rounded-full shadow-2xl hover:scale-110 transition-all active:scale-95 group"
       >
-        <MessageCircle size={30} strokeWidth={1.5} />
+        <img 
+          src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+          alt="WhatsApp" 
+          className="w-8 h-8"
+          referrerPolicy="no-referrer"
+        />
         <span className="absolute -top-1 -right-1 flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-gold"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-4 w-4 bg-white"></span>
         </span>
       </button>
 
