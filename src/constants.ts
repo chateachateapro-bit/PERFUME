@@ -105,26 +105,27 @@ export const REVIEWS: Review[] = [
   { name: "Luis F.", stars: 5, text: "El servicio fue impecable y el envío a Medellín llegó rapidísimo. El empaque es de otro nivel." },
   { name: "Santiago D.", stars: 5, text: "Buscaba algo diferente para mi boda y Noche fue la elección perfecta. Elegancia pura." },
   { name: "Mauricio K.", stars: 5, text: "Llevo usando el set un mes y ya no quiero volver a mis perfumes comerciales. Esto es otra liga." },
-  { name: "Enrique S.", stars: 5, text: "Pagar el 50% por los 4 frascos es la mejor inversión que he hecho en mi imagen personal este año." }
+  { name: "Enrique S.", stars: 5, text: "Pagar el 50% por los 4 frascos es la mejor inversión que he hecho en mi imagen personal este año." },
+  { name: "Gabriel V.", stars: 5, text: "Vivo en Panamá y el pedido llegó sin problemas. La fijación es impresionante incluso en climas húmedos." }
 ];
 
 export const COUNTRIES: Record<string, Country> = {
   COL: { 
-    id: "COL", name: "Colombia", currency: "COP", flag: "🇨🇴", rate: 1, symbol: "$",
+    id: "COL", name: "Colombia", currency: "COP", flag: "https://flagcdn.com/w80/co.png", rate: 1, symbol: "$",
     fields: [
       { id: "dept", label: "Departamento", placeholder: "Ej: Antioquia" },
       { id: "city", label: "Ciudad", placeholder: "Ej: Medellín" }
     ]
   },
   PAN: { 
-    id: "PAN", name: "Panamá", currency: "USD", flag: "🇵🇦", rate: 1 / 4000, symbol: "$",
+    id: "PAN", name: "Panamá", currency: "USD", flag: "https://flagcdn.com/w80/pa.png", rate: 1 / 4000, symbol: "$",
     fields: [
       { id: "prov", label: "Provincia", placeholder: "Ej: Panamá City" },
       { id: "dist", label: "Distrito", placeholder: "Ej: San Miguelito" }
     ]
   },
   CRI: { 
-    id: "CRI", name: "Costa Rica", currency: "CRC", flag: "🇨🇷", rate: 0.13, symbol: "₡",
+    id: "CRI", name: "Costa Rica", currency: "CRC", flag: "https://flagcdn.com/w80/cr.png", rate: 0.13, symbol: "₡",
     fields: [
       { id: "prov", label: "Provincia", placeholder: "Ej: San José" },
       { id: "cant", label: "Cantón", placeholder: "Ej: Escazú" },
@@ -132,7 +133,7 @@ export const COUNTRIES: Record<string, Country> = {
     ]
   },
   SLV: { 
-    id: "SLV", name: "El Salvador", currency: "USD", flag: "🇸🇻", rate: 1 / 4000, symbol: "$",
+    id: "SLV", name: "El Salvador", currency: "USD", flag: "https://flagcdn.com/w80/sv.png", rate: 1 / 4000, symbol: "$",
     fields: [
       { id: "dept", label: "Departamento", placeholder: "Ej: San Salvador" },
       { id: "muni", label: "Municipio", placeholder: "Ej: Soyapango" }

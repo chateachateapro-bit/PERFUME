@@ -68,6 +68,8 @@ export default function App() {
     paymentMethod: "contra-entrega"
   });
 
+  const [isCountrySelectorOpen, setIsCountrySelectorOpen] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll);
@@ -112,14 +114,51 @@ export default function App() {
 
           <div className="flex flex-col items-center max-w-[50%] sm:max-w-none">
             <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-display tracking-[0.2em] md:tracking-[0.5em] font-light leading-none cursor-pointer text-center" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>L'ESSENCE</h1>
-            <span className="text-[5px] md:text-[7px] tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold text-gray-300 mt-2">Héritage 🇫🇷 Français</span>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-[5px] md:text-[7px] tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold text-gray-300">Héritage</span>
+              <img src="https://flagcdn.com/w40/fr.png" alt="France" className="w-3 md:w-4 border border-gray-100 transition-all" referrerPolicy="no-referrer" />
+              <span className="text-[5px] md:text-[7px] tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold text-gray-300">Français</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="hidden md:flex items-center gap-2 cursor-pointer opacity-40 hover:opacity-100 transition-opacity" onClick={() => setIsMenuOpen(true)}>
-              <span className="text-[9px] font-black tracking-widest uppercase">{selectedCountry.id}</span>
-              <ChevronDown size={10} />
+          <div className="flex items-center gap-4 md:gap-6">
+            <div className="relative">
+              <div 
+                className="flex items-center gap-1.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity" 
+                onClick={() => setIsCountrySelectorOpen(!isCountrySelectorOpen)}
+              >
+                <div className="w-8 h-5 border border-gray-100 flex items-center justify-center bg-gray-50">
+                  <span className="text-[8px] font-black tracking-tighter uppercase">{selectedCountry.id}</span>
+                </div>
+                <ChevronDown size={8} className={`transition-transform duration-300 ${isCountrySelectorOpen ? 'rotate-180' : ''}`} />
+              </div>
+              
+              <AnimatePresence>
+                {isCountrySelectorOpen && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-full right-0 mt-2 bg-white border border-gray-100 shadow-xl py-2 min-w-[120px] z-[200]"
+                  >
+                    {Object.values(COUNTRIES).map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => {
+                          setSelectedCountry(c);
+                          setIsCountrySelectorOpen(false);
+                        }}
+                        className={`w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors ${selectedCountry.id === c.id ? 'bg-gold/5' : ''}`}
+                      >
+                        <span className="text-[9px] font-bold uppercase tracking-widest">{c.name}</span>
+                        <span className="text-[8px] font-black text-gray-300">{c.id}</span>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
+            
             <button onClick={() => openCheckout(STAR_SET)} className="p-2 relative">
               <ShoppingBag size={20} strokeWidth={1.5} />
               {wishlist.length > 0 && <span className="absolute top-0 right-0 w-2 h-2 bg-gold rounded-full" />}
@@ -157,12 +196,17 @@ export default function App() {
                 </motion.div>
             </div>
             <div className="w-full lg:col-span-5 text-center md:text-left flex flex-col items-center lg:items-start">
-                <span className="premium-label text-gold mb-8 block font-black">Exclusive Selection</span>
-                <h3 className="h-section mb-10 text-center lg:text-left w-full"> Tu Legado Completo <br /> <span className="font-light">Maison Heritage</span></h3>
-                <p className="body-luxury mb-12 max-w-md mx-auto lg:mx-0 text-center lg:text-left"> No es una casualidad, es una estrategia. Cuatro fórmulas maestras para que nunca pases desapercibido. </p>
+                <div className="bg-gold/10 text-gold px-4 py-2 text-[9px] font-black uppercase tracking-[0.3em] mb-6 rounded-full inline-block">Oferta Especial de Lanzamiento</div>
+                <h3 className="h-section mb-10 text-center lg:text-left w-full"> 4 Perfumes <br /> <span className="font-light">al precio de 2</span></h3>
+                <p className="body-luxury mb-12 max-w-md mx-auto lg:mx-0 text-center lg:text-left"> Tu arsenal completo para cada ocasión. 4 fórmulas maestras importadas que garantizan que nunca pases desapercibido. </p>
                 
                 <div className="space-y-6 mb-16 w-full max-w-sm mx-auto lg:mx-0">
-                    {["4 Perfumes de 30ml (Set Completo)", "Envío Prioritario Gratis", "Garantía de Autenticidad Grasse"].map((item, i) => (
+                    {[
+                        "Set de 4 Fragancias (30ml c/u)", 
+                        "Entrega Local e Histórica Grasse", 
+                        "Pago Contraentrega Disponible",
+                        "Garantía de Satisfacción Total"
+                    ].map((item, i) => (
                         <div key={i} className="flex items-center gap-4 text-left border-b border-gray-100 pb-4">
                             <Check size={16} className="text-gold shrink-0" />
                             <span className="text-[11px] font-bold uppercase tracking-widest">{item}</span>
@@ -176,14 +220,20 @@ export default function App() {
                             <p className="premium-label text-gray-200 mb-6 font-black uppercase tracking-[0.3em]">Precio Maison</p>
                             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-5 justify-center md:justify-start">
                                 <span className="text-5xl xs:text-6xl md:text-6xl font-black leading-none tracking-tighter">{formatPrice(STAR_SET.price, selectedCountry)}</span>
-                                <span className="text-[10px] font-black text-gold border border-gold/40 px-4 py-2 uppercase tracking-[0.2em] bg-gold/5 block w-fit">50% OFF</span>
+                                <span className="text-[10px] font-black text-gold border border-gold/40 px-4 py-2 uppercase tracking-[0.2em] bg-gold/5 block w-fit">4x2 Maison</span>
                             </div>
                         </div>
                         <button onClick={() => openCheckout(STAR_SET)} className="btn-premium w-full md:w-auto shadow-gold/20 py-6"> ORDENAR SET </button>
                     </div>
-                    <div className="flex items-center justify-center md:justify-start gap-4 opacity-30 mt-4">
-                        <Truck size={14} className="text-gold" />
-                        <span className="text-[9px] font-black uppercase tracking-[0.3em]">Entrega Aérea Asegurada</span>
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-8 gap-y-4 opacity-40 mt-4 border-t border-gray-50 pt-8">
+                        <div className="flex items-center gap-3">
+                            <Truck size={14} className="text-gold" />
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em]">Logística Local Directa</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Package size={14} className="text-gold" />
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em]">Entrega Aérea Asegurada</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -270,7 +320,7 @@ export default function App() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {REVIEWS.slice(0, 6).map((rev, i) => (
+            {REVIEWS.map((rev, i) => (
                 <div key={i} className="bg-white p-10 md:p-14 border border-gray-50 flex flex-col justify-between hover:shadow-2xl transition-all duration-700">
                     <p className="text-gray-500 font-sans text-sm md:text-base leading-relaxed mb-12 italic"> "{rev.text}" </p>
                     <div className="flex items-center gap-5 pt-8 border-t border-gray-50">
@@ -299,14 +349,6 @@ export default function App() {
                         <li key={l} className="text-[10px] font-black uppercase tracking-widest text-gray-300 hover:text-luxury-black cursor-pointer transition-all">{l}</li>
                     ))}
                 </ul>
-            </div>
-            <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-                <span className="premium-label mb-10 block">Región Aktive</span>
-                <div className="flex gap-6">
-                    {Object.values(COUNTRIES).map(c => (
-                        <button key={c.id} onClick={() => setSelectedCountry(c)} className={`text-3xl transition-transform ${selectedCountry.id === c.id ? 'scale-125' : 'opacity-20 grayscale'}`}> {c.flag} </button>
-                    ))}
-                </div>
             </div>
         </div>
         <div className="max-w-7xl mx-auto mt-32 pt-12 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-8 text-[8px] font-black uppercase tracking-[0.4em] text-gray-200">
@@ -365,9 +407,8 @@ export default function App() {
                                 <div className="space-y-1"><label className="premium-label">Nombre</label><input className="premium-input" placeholder="Nombre" onChange={e=>setFormData({...formData, name: e.target.value})} /></div>
                                 <div className="space-y-1"><label className="premium-label">Apellidos</label><input className="premium-input" placeholder="Apellidos" onChange={e=>setFormData({...formData, lastName: e.target.value})} /></div>
                             </div>
-                            <div className="grid grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-1"><label className="premium-label">Teléfono WhatsApp</label><input className="premium-input" placeholder="+57 ---" onChange={e=>setFormData({...formData, phone: e.target.value})} /></div>
-                                <div className="space-y-1"><label className="premium-label">País de Destino</label><div className="premium-input text-gray-200">{selectedCountry.flag} {selectedCountry.name}</div></div>
                             </div>
                         </div>
 
