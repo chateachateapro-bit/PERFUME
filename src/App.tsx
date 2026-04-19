@@ -133,10 +133,10 @@ export default function App() {
         <div className="max-w-5xl mx-auto px-6">
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2 }}>
                 <span className="premium-label text-gold mb-8 block font-black">Inmersión Sensorial Francesa</span>
-                <h2 className="h-hero mb-12"> Domina cada espacio <br className="hidden md:block" /> con tu presencia </h2>
-                <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.4em] text-gray-300 mb-16"> Grasse · 4 Fragancias · 1 Solo Legado </p>
+                <h2 className="h-hero mb-12"> Hay 4.000 millones de hombres <br className="hidden md:block" /> <span className="font-light normal-case tracking-normal">y la mayoría huele igual.</span> </h2>
+                <p className="body-luxury max-w-2xl mx-auto mb-16 uppercase tracking-[0.2em] text-[10px] md:text-[12px] font-black leading-loose text-gray-400"> Únete a los pocos que dominan cada espacio <br className="hidden md:block"/> con un legado importado de Grasse. </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto sm:max-w-none">
-                    <button onClick={() => openCheckout(STAR_SET)} className="btn-premium w-full sm:w-auto"> LA MEJOR OPCIÓN </button>
+                    <button onClick={() => openCheckout(STAR_SET)} className="btn-premium w-full sm:w-auto"> ORDENAR SET </button>
                     <button onClick={() => document.getElementById('catalog')?.scrollIntoView({behavior: 'smooth'})} className="btn-outline w-full sm:w-auto"> EXPLORAR COLECCIÓN </button>
                 </div>
             </motion.div>
