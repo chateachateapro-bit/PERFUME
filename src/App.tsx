@@ -26,8 +26,13 @@ import { FRAGRANCES, STAR_SET, COUNTRIES, PROFILE_QUESTIONS, REVIEWS } from "./c
 import { Fragrance, Country, OrderData } from "./types";
 
 // --- UTILS ---
-const formatPrice = (price: number, country: Country) => {
-  const converted = Math.round(price * country.rate);
+const INT_FEE_COP = 20000;
+
+const formatPrice = (priceCOP: number, country: Country, isFinalPrice = false) => {
+  // If we are passing a final price (total), it already includes the fee if applicable.
+  // Otherwise, we add it here for catalog/display purposes.
+  const fee = (!isFinalPrice && country.id !== 'COL') ? INT_FEE_COP : 0;
+  const converted = Math.round((priceCOP + fee) * country.rate);
   return `${country.symbol}${converted.toLocaleString('de-DE')}`;
 };
 
@@ -62,6 +67,7 @@ export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [showTest, setShowTest] = useState(false);
+  const [showInitialModal, setShowInitialModal] = useState(false);
   const [testStep, setTestStep] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [profileResult, setProfileResult] = useState<{name: string, protagonists: string[]} | null>(null);
@@ -124,7 +130,10 @@ export default function App() {
     setWishlist(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
-  const currentPrice = activeProduct?.price || STAR_SET.price;
+  const currentPriceBase = activeProduct?.price || STAR_SET.price;
+  const internationalFee = selectedCountry.id !== 'COL' ? INT_FEE_COP : 0;
+  const currentPrice = currentPriceBase + internationalFee;
+  
   const shippingCost = (activeProduct?.id === 'set-completo' || !activeProduct) ? 0 : 10990;
   const discountRate = formData.paymentMethod === 'anticipado' ? 0.2 : 0;
   const discountAmount = currentPrice * discountRate;
@@ -163,7 +172,7 @@ export default function App() {
         ...formData, 
         phone: fullPhone, 
         product: activeProduct?.name || STAR_SET.name, 
-        price: formatPrice(totalPrice, selectedCountry), 
+        price: formatPrice(totalPrice, selectedCountry, true), 
         country: selectedCountry.name 
       });
       
@@ -176,7 +185,7 @@ export default function App() {
         ...formData, 
         phone: fullPhone, 
         product: activeProduct?.name || STAR_SET.name, 
-        price: formatPrice(totalPrice, selectedCountry), 
+        price: formatPrice(totalPrice, selectedCountry, true), 
         country: selectedCountry.name 
       });
       window.open(link, '_blank');
@@ -185,6 +194,15 @@ export default function App() {
 
   const [scrolledVal, setScrolledVal] = useState(false);
   useEffect(() => {
+    // 1. Check for stored country
+    const storedCountryId = localStorage.getItem("user-country");
+    if (storedCountryId && COUNTRIES[storedCountryId]) {
+      setSelectedCountry(COUNTRIES[storedCountryId]);
+    } else {
+      setShowInitialModal(true);
+    }
+
+    // 2. Scroll listener
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
       setScrolledVal(window.scrollY > 40);
@@ -229,18 +247,22 @@ export default function App() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-full right-0 mt-2 bg-white border border-gray-100 shadow-xl py-2 min-w-[120px] z-[200]"
+                    className="absolute top-full right-0 mt-2 bg-white border border-gray-100 shadow-xl py-2 min-w-[150px] z-[200]"
                   >
                     {Object.values(COUNTRIES).map((c) => (
                       <button
                         key={c.id}
                         onClick={() => {
                           setSelectedCountry(c);
+                          localStorage.setItem("user-country", c.id);
                           setIsCountrySelectorOpen(false);
                         }}
                         className={`w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors ${selectedCountry.id === c.id ? 'bg-gold/5' : ''}`}
                       >
-                        <span className="text-[9px] font-bold uppercase tracking-widest">{c.name}</span>
+                        <div className="flex items-center gap-2">
+                            <img src={c.flag} className="w-4 h-3 object-cover" alt="" referrerPolicy="no-referrer" />
+                            <span className="text-[9px] font-bold uppercase tracking-widest">{c.name}</span>
+                        </div>
                         <span className="text-[8px] font-black text-gray-300">{c.id}</span>
                       </button>
                     ))}
@@ -314,6 +336,9 @@ export default function App() {
                                 <span className="text-5xl xs:text-6xl md:text-6xl font-black leading-none tracking-tighter">{formatPrice(STAR_SET.price, selectedCountry)}</span>
                                 <span className="text-[10px] font-black text-gold border border-gold/40 px-4 py-2 uppercase tracking-[0.2em] bg-gold/5 block w-fit">4x2 Maison</span>
                             </div>
+                            {selectedCountry.id !== 'COL' && (
+                                <p className="text-[8px] font-bold text-gray-400 mt-2 uppercase tracking-[0.1em]">Incluye ajuste logístico internacional</p>
+                            )}
                         </div>
                         <button onClick={() => openCheckout(STAR_SET)} className="btn-premium w-full md:w-auto shadow-gold/20 py-6"> ORDENAR SET </button>
                     </div>
@@ -364,7 +389,10 @@ export default function App() {
                         <div className="text-center">
                             <span className="text-[8px] font-black text-gray-200 uppercase tracking-[0.4em] mb-3 block">Legado {f.name}</span>
                             <h4 className="h-card mb-4">{f.name}</h4>
-                            <p className="text-lg md:text-xl font-black tracking-tight mb-6">{formatPrice(f.price, selectedCountry)}</p>
+                            <p className="text-lg md:text-xl font-black tracking-tight mb-2">{formatPrice(f.price, selectedCountry)}</p>
+                            {selectedCountry.id !== 'COL' && (
+                                <p className="text-[8px] font-bold text-gray-400 mb-6 uppercase tracking-[0.05em] leading-none">Ajuste logístico incluido</p>
+                            )}
                             <button className="btn-premium py-3 px-6 text-[8px] opacity-0 group-hover:opacity-100 transition-all">ORDENAR AHORA</button>
                         </div>
                     </div>
@@ -702,32 +730,37 @@ export default function App() {
                             <div className="flex-1">
                                 <h4 className="text-[11px] font-black uppercase tracking-widest mb-1">{activeProduct?.name || STAR_SET.name}</h4>
                                 <p className="text-[10px] text-gray-400 uppercase tracking-widest">{activeProduct?.presentation}</p>
-                                <p className={`text-xl font-bold mt-4 tracking-tighter ${formData.paymentMethod === 'anticipado' ? 'text-gray-300 line-through' : ''}`}>{formatPrice(currentPrice, selectedCountry)}</p>
-                                {formData.paymentMethod === 'anticipado' && <p className="text-2xl font-black text-gold tracking-tighter mt-1">{formatPrice(currentPrice - discountAmount, selectedCountry)}</p>}
+                                <p className={`text-xl font-bold mt-4 tracking-tighter ${formData.paymentMethod === 'anticipado' ? 'text-gray-300 line-through' : ''}`}>{formatPrice(currentPrice, selectedCountry, true)}</p>
+                                {formData.paymentMethod === 'anticipado' && <p className="text-2xl font-black text-gold tracking-tighter mt-1">{formatPrice(currentPrice - discountAmount, selectedCountry, true)}</p>}
                             </div>
                         </div>
 
                         <div className="space-y-6 pt-4">
                             <div className="flex justify-between items-center">
                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Inversión Bruta</span>
-                                <span className="text-lg font-bold tracking-tight">{formatPrice(currentPrice, selectedCountry)}</span>
+                                <span className="text-lg font-bold tracking-tight">{formatPrice(currentPrice, selectedCountry, true)}</span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Logística Maison</span>
                                 <span className={`text-[11px] font-black uppercase tracking-widest ${shippingCost === 0 ? 'text-green-600' : 'text-gray-900'}`}>
-                                    {shippingCost === 0 ? "Cortesia (Gratis)" : formatPrice(shippingCost, selectedCountry)}
+                                    {shippingCost === 0 ? "Cortesia (Gratis)" : formatPrice(shippingCost, selectedCountry, true)}
                                 </span>
                             </div>
                             {formData.paymentMethod === 'anticipado' && (
                                 <div className="space-y-4 pt-4 border-t border-gray-100 animate-in fade-in slide-in-from-top-4 duration-700">
                                     <div className="flex justify-between items-center">
                                         <span className="text-[10px] font-black text-gold uppercase tracking-[0.2em]">Beneficio Maison (-20%)</span>
-                                        <span className="text-lg font-black text-gold">-{formatPrice(discountAmount, selectedCountry)}</span>
+                                        <span className="text-lg font-black text-gold">-{formatPrice(discountAmount, selectedCountry, true)}</span>
                                     </div>
                                     <div className="bg-gold/5 p-4 border border-gold/10 rounded-sm flex justify-between items-center">
                                         <span className="text-[9px] font-black uppercase tracking-widest text-gold">TU AHORRO TOTAL HOY:</span>
-                                        <span className="text-xl font-black text-gold">{formatPrice(discountAmount, selectedCountry)}</span>
+                                        <span className="text-xl font-black text-gold">{formatPrice(discountAmount, selectedCountry, true)}</span>
                                     </div>
+                                </div>
+                            )}
+                            {selectedCountry.id !== 'COL' && (
+                                <div className="bg-gray-100/50 p-4 rounded-sm">
+                                    <p className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.1em] text-center">Referencia incluye ajuste logístico internacional</p>
                                 </div>
                             )}
                         </div>
@@ -742,7 +775,7 @@ export default function App() {
                                     <span className="px-3 py-1 bg-gold text-white text-[8px] font-black uppercase animate-pulse">Descuento Aplicado</span>
                                 )}
                             </div>
-                            <p className="text-7xl font-black tracking-tighter leading-none">{formatPrice(totalPrice, selectedCountry)}</p>
+                            <p className="text-7xl font-black tracking-tighter leading-none">{formatPrice(totalPrice, selectedCountry, true)}</p>
                             <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-4">Incluye seguro de transporte y logística premium</p>
                         </div>
 
@@ -777,6 +810,54 @@ export default function App() {
                 </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* INITIAL COUNTRY SELECTOR MODAL */}
+      <AnimatePresence>
+        {showInitialModal && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="fixed inset-0 z-[1000] flex items-center justify-center bg-luxury-black/95 backdrop-blur-md p-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 30 }} 
+              animate={{ scale: 1, y: 0 }} 
+              className="bg-white w-full max-w-lg p-10 md:p-16 shadow-2xl text-center"
+            >
+              <div className="mb-10">
+                <span className="text-gold text-[10px] font-black uppercase tracking-[0.5em] mb-4 block">Bienvenue à L'Essence</span>
+                <h3 className="text-2xl md:text-3xl font-display font-light uppercase tracking-widest leading-tight">¿Desde qué país compras?</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-4">
+                {Object.values(COUNTRIES).map((c) => (
+                  <button 
+                    key={c.id} 
+                    onClick={() => {
+                        setSelectedCountry(c);
+                        localStorage.setItem("user-country", c.id);
+                        setShowInitialModal(false);
+                    }}
+                    className="group border border-gray-100 p-6 flex items-center justify-between hover:border-gold hover:bg-gold/5 transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-4">
+                      <img src={c.flag} className="w-8 h-6 object-cover shadow-sm" alt="" referrerPolicy="no-referrer" />
+                      <span className="text-sm font-black uppercase tracking-widest group-hover:text-gold transition-colors">{c.name}</span>
+                    </div>
+                    <ChevronRight size={16} className="text-gray-200 group-hover:text-gold group-hover:translate-x-2 transition-all" />
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-12 flex items-center justify-center gap-3 opacity-30">
+                <ShieldCheck size={14} />
+                <span className="text-[8px] font-black uppercase tracking-widest text-gray-500">Sesión Segura & Entrega Maison</span>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
