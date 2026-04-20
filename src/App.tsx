@@ -37,7 +37,6 @@ const formatPrice = (priceCOP: number, country: Country, isFinalPrice = false) =
 };
 
 const WA_SALES = "12089693393";
-const WA_CONFIRM = "573174555271";
 
 const getConfirmationWALink = (data: OrderData & { lastName: string }) => {
     let locationStr = "";
@@ -56,7 +55,7 @@ const getConfirmationWALink = (data: OrderData & { lastName: string }) => {
   💳 PAGO: ${data.paymentMethod}
   💰 TOTAL: ${data.price}`;
   
-    return `https://wa.me/${WA_CONFIRM}?text=${encodeURIComponent(message)}`;
+    return `https://wa.me/${WA_SALES}?text=${encodeURIComponent(message)}`;
   };
 
 export default function App() {
@@ -494,7 +493,7 @@ export default function App() {
             </div>
         </div>
         <div className="max-w-7xl mx-auto mt-32 pt-12 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-8 text-[8px] font-black uppercase tracking-[0.4em] text-gray-200">
-            <p>© 2026 L’ESSENCE DE GRASSE · FR · CO · PA · CR · SV</p>
+            <p>© 2026 L’ESSENCE DE GRASSE · FR · CO · PA · CR · SV · GT</p>
             <div className="flex gap-12">
                 <span>Authenticité</span>
                 <span>Luxe Absolu</span>
@@ -900,7 +899,7 @@ export default function App() {
 
       {/* WHATSAPP FLOATING */}
       <button 
-        onClick={() => window.open(`https://wa.me/${WA_SALES}`, '_blank')}
+        onClick={() => window.open(`https://wa.me/${WA_SALES}?text=${encodeURIComponent("Hola, quiero realizar una compra.")}`, '_blank')}
         className="fixed bottom-24 right-6 md:bottom-12 md:right-12 z-[150] w-16 h-16 bg-[#25D366]/60 backdrop-blur-sm text-white flex items-center justify-center rounded-full shadow-2xl hover:bg-[#25D366] hover:scale-110 opacity-70 hover:opacity-100 transition-all active:scale-95 group"
       >
         <img 

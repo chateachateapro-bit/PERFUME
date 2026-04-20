@@ -142,6 +142,13 @@ export const COUNTRIES: Record<string, Country> = {
       { id: "dept", label: "Departamento", placeholder: "Ej: San Salvador" },
       { id: "muni", label: "Municipio / Ciudad", placeholder: "Ej: Soyapango" }
     ]
+  },
+  GTM: { 
+    id: "GTM", name: "Guatemala", dialCode: "+502", currency: "GTQ", flag: "https://flagcdn.com/w80/gt.png", rate: 0.0020, symbol: "Q",
+    fields: [
+      { id: "dept", label: "Departamento", placeholder: "Ej: Guatemala" },
+      { id: "muni", label: "Municipio", placeholder: "Ej: Villa Nueva" }
+    ]
   }
 };
 
