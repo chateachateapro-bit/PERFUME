@@ -521,7 +521,7 @@ export default function App() {
       {/* WHATSAPP FLOATING */}
       <button 
         onClick={() => window.open(`https://wa.me/${WA_SALES}`, '_blank')}
-        className="fixed bottom-24 right-6 md:bottom-12 md:right-12 z-[150] w-16 h-16 bg-[#25D366] text-white flex items-center justify-center rounded-full shadow-2xl hover:scale-110 transition-all active:scale-95 group"
+        className="fixed bottom-24 right-6 md:bottom-12 md:right-12 z-[150] w-16 h-16 bg-[#25D366]/60 backdrop-blur-sm text-white flex items-center justify-center rounded-full shadow-2xl hover:bg-[#25D366] hover:scale-110 opacity-70 hover:opacity-100 transition-all active:scale-95 group"
       >
         <img 
           src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
