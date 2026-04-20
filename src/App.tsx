@@ -45,7 +45,7 @@ const getConfirmationWALink = (data: OrderData & { lastName: string }) => {
       locationStr += `\n  📍 ${key.toUpperCase()}: ${value}`;
     });
 
-    const message = `Hola L'Essence, confirmo mi pedido:
+    const message = `Hola L’ESSENCE DE GRASSE, confirmo mi pedido:
   
   📦 PRODUCTO: ${data.product}
   👤 CLIENTE: ${data.name} ${data.lastName}
@@ -221,7 +221,7 @@ export default function App() {
           </button>
 
           <div className="flex flex-col items-center max-w-[50%] sm:max-w-none">
-            <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-display tracking-[0.2em] md:tracking-[0.5em] font-light leading-none cursor-pointer text-center" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>L'ESSENCE</h1>
+            <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-display tracking-[0.2em] md:tracking-[0.5em] font-light leading-none cursor-pointer text-center" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>L’ESSENCE DE GRASSE</h1>
             <div className="flex items-center gap-2 mt-2">
               <span className="text-[5px] md:text-[7px] tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold text-gray-300">Héritage</span>
               <img src="https://flagcdn.com/w40/fr.png" alt="France" className="w-3 md:w-4 border border-gray-100 transition-all" referrerPolicy="no-referrer" />
@@ -412,7 +412,7 @@ export default function App() {
                             Descubre el Origen <br /> <span className="font-light text-gold">De Nuestra Inspiración</span>
                         </h2>
                         <p className="body-luxury text-lg max-w-md mb-12">
-                            Importamos maestría desde el epicentro mundial de la perfumería fina. Cada gota de L'Essence nace en Grasse, Francia, garantizando una complejidad y fijación inigualables.
+                            Importamos maestría desde el epicentro mundial de la perfumería fina. Cada gota de L’ESSENCE DE GRASSE nace en Grasse, Francia, garantizando una complejidad y fijación inigualables.
                         </p>
                         
                         <div className="flex flex-col items-center text-center w-full pt-10 border-t border-gray-100">
@@ -481,7 +481,7 @@ export default function App() {
       <footer className="bg-white border-t border-gray-100 py-24 md:py-48 px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-12 gap-y-20">
             <div className="col-span-12 lg:col-span-6">
-                <h2 className="text-4xl font-display tracking-[0.5em] mb-12 uppercase font-light">L'ESSENCE</h2>
+                <h2 className="text-4xl font-display tracking-[0.5em] mb-12 uppercase font-light">L’ESSENCE DE GRASSE</h2>
                 <p className="body-luxury max-w-sm uppercase text-[10px] font-black tracking-widest leading-loose"> Maison de parfum · Destilando estatus · No es un aroma, es un legado emocional. </p>
             </div>
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
@@ -494,7 +494,7 @@ export default function App() {
             </div>
         </div>
         <div className="max-w-7xl mx-auto mt-32 pt-12 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-8 text-[8px] font-black uppercase tracking-[0.4em] text-gray-200">
-            <p>© 2026 L'ESSENCE · FR · CO · PA · CR · SV</p>
+            <p>© 2026 L’ESSENCE DE GRASSE · FR · CO · PA · CR · SV</p>
             <div className="flex gap-12">
                 <span>Authenticité</span>
                 <span>Luxe Absolu</span>
@@ -828,7 +828,7 @@ export default function App() {
               className="bg-white w-full max-w-lg p-10 md:p-16 shadow-2xl text-center"
             >
               <div className="mb-10">
-                <span className="text-gold text-[10px] font-black uppercase tracking-[0.5em] mb-4 block">Bienvenue à L'Essence</span>
+                <span className="text-gold text-[10px] font-black uppercase tracking-[0.5em] mb-4 block">Bienvenue à L’ESSENCE DE GRASSE</span>
                 <h3 className="text-2xl md:text-3xl font-display font-light uppercase tracking-widest leading-tight">¿Desde qué país compras?</h3>
               </div>
               

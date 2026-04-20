@@ -104,7 +104,7 @@ export const REVIEWS: Review[] = [
   { name: "Camilo P.", stars: 5, text: "Me gustó que cada fragancia tiene su personalidad. No se siente como comprar cuatro iguales." },
   { name: "Andrés R.", stars: 5, text: "El elegante me pareció perfecto para reuniones. Se siente sofisticado." },
   { name: "Mateo L.", stars: 5, text: "Se nota que no es el típico perfume de siempre. Tiene una identidad diferente." },
-  { name: "Ricardo V.", stars: 5, text: "Soy coleccionista de fragancias y este set de L'Essence tiene una calidad que compite con marcas de nicho." },
+  { name: "Ricardo V.", stars: 5, text: "Soy coleccionista de fragancias y este set de L’ESSENCE DE GRASSE tiene una calidad que compite con marcas de nicho." },
   { name: "Oscar H.", stars: 5, text: "Increíble cómo cambia la percepción de la gente cuando usas el de Magnetismo. Totalmente recomendado." },
   { name: "Luis F.", stars: 5, text: "El servicio fue impecable y el envío a Medellín llegó rapidísimo. El empaque es de otro nivel." },
   { name: "Santiago D.", stars: 5, text: "Buscaba algo diferente para mi boda y Noche fue la elección perfecta. Elegancia pura." },
