@@ -65,6 +65,7 @@ export default function App() {
   const [testStep, setTestStep] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [profileResult, setProfileResult] = useState<{name: string, protagonists: string[]} | null>(null);
+  const [showMap, setShowMap] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -370,28 +371,98 @@ export default function App() {
         </div>
       </section>
 
-      {/* 6. MAISON HISTORY - FRENCH ORIGIN */}
-      <section className="bg-luxury-black text-white min-h-[600px] flex flex-col md:flex-row">
-        <div className="w-full md:w-1/2 min-h-[400px]">
-            <img 
-                src="https://images.unsplash.com/photo-1582211594533-268f4f1edcb9?q=80&w=2600&auto=format&fit=crop" 
-                alt="Maison Grasse" 
-                className="w-full h-full object-cover grayscale opacity-40 hover:grayscale-0 transition-all duration-1000"
-                referrerPolicy="no-referrer"
-            />
-        </div>
-        <div className="w-full md:w-1/2 p-12 md:p-32 flex flex-col justify-center">
-            <span className="premium-label text-gold mb-8 block">Grasse · Côte d'Azur</span>
-            <h2 className="text-[32px] md:text-[60px] font-light leading-none mb-12 uppercase tracking-tighter"> El Arte de la <br /> <span className="text-gold font-bold">Destilación Francesa</span></h2>
-            <p className="body-luxury text-gray-400 text-lg mb-16 max-w-sm"> Importamos maestría. Cada gota nace en el epicentro mundial de la perfumería fina, garantizando una fijación y complejidad inigualables en el mercado latino. </p>
-            <div className="grid grid-cols-2 gap-12 pt-12 border-t border-white/10">
-                <div>
-                    <span className="premium-label text-gold opacity-100">LOGÍSTICA</span>
-                    <p className="text-xl font-bold uppercase tracking-widest">Aérea Directa</p>
+      {/* 6. THE ORIGIN - INTERACTIVE EXPERIENCE */}
+      <section className="bg-white section-padding overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                <div className="space-y-12">
+                    <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+                        <span className="premium-label text-gold mb-6 block">Le Berceau du Parfum</span>
+                        <h2 className="text-[32px] md:text-[60px] font-display tracking-tight leading-[1.1] uppercase mb-10">
+                            Descubre el Origen <br /> <span className="font-light text-gold">De Nuestra Inspiración</span>
+                        </h2>
+                        <p className="body-luxury text-lg max-w-md mb-12">
+                            Importamos maestría desde el epicentro mundial de la perfumería fina. Cada gota de L'Essence nace en Grasse, Francia, garantizando una complejidad y fijación inigualables.
+                        </p>
+                        
+                        <div className="grid grid-cols-2 gap-8 pt-10 border-t border-gray-100">
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-gold">Ubicación</span>
+                                <p className="text-sm font-bold uppercase tracking-widest">Grasse, Côte d'Azur</p>
+                            </div>
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-gold">Método</span>
+                                <p className="text-sm font-bold uppercase tracking-widest">Destilación Artesanal</p>
+                            </div>
+                        </div>
+
+                        <button 
+                            onClick={() => setShowMap(!showMap)}
+                            className="btn-outline mt-16 group"
+                        >
+                            {showMap ? 'VER DESTILERÍA' : 'DESCUBRIR MAPA'}
+                            <motion.div animate={{ x: showMap ? -5 : 5 }} transition={{ repeat: Infinity, duration: 1.5, repeatType: 'reverse' }}>
+                                <ArrowRight size={16} />
+                            </motion.div>
+                        </button>
+                    </motion.div>
                 </div>
-                <div>
-                    <span className="premium-label text-gold opacity-100">CALIDAD</span>
-                    <p className="text-xl font-bold uppercase tracking-widest">ISO 9001 Grasse</p>
+
+                <div className="relative aspect-square lg:aspect-auto lg:h-[700px] group cursor-pointer" onClick={() => setShowMap(!showMap)}>
+                    <AnimatePresence mode="wait">
+                        {!showMap ? (
+                            <motion.div 
+                                key="image"
+                                initial={{ opacity: 0, scale: 1.1 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 1.1 }}
+                                transition={{ duration: 0.8 }}
+                                className="w-full h-full relative overflow-hidden shadow-2xl"
+                            >
+                                <img 
+                                    src="https://images.unsplash.com/photo-1515377274092-23f27f8cc930?auto=format&fit=crop&q=80&w=2600"
+                                    alt="Artisan Perfumery in Grasse"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+                                    referrerPolicy="no-referrer"
+                                />
+                                <div className="absolute inset-0 bg-luxury-black/10 group-hover:bg-transparent transition-colors duration-700" />
+                                <div className="absolute bottom-10 left-10 text-white z-10">
+                                    <span className="text-[9px] font-black uppercase tracking-[0.4em] mb-2 block">Atelier Grasse</span>
+                                    <p className="text-xl font-light italic">Tradición Francesa Pura</p>
+                                </div>
+                            </motion.div>
+                        ) : (
+                            <motion.div 
+                                key="map"
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                transition={{ duration: 0.8 }}
+                                className="w-full h-full bg-[#F5F2ED] border border-gray-100 shadow-2xl relative flex items-center justify-center p-12"
+                            >
+                                {/* SIMULATED PREMIUM MAP */}
+                                <div className="relative w-full h-full opacity-60">
+                                    <svg viewBox="0 0 100 100" className="w-full h-full text-luxury-black/10">
+                                        <path d="M20,20 Q50,0 80,20 Q100,50 80,80 Q50,100 20,80 Q0,50 20,20" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                                        <path d="M30,30 Q50,40 70,30" fill="none" stroke="currentColor" strokeWidth="0.2" strokeDasharray="2,2" />
+                                        <circle cx="75" cy="70" r="1.5" className="fill-gold animate-pulse" />
+                                        <text x="78" y="70" className="text-[4px] font-black uppercase fill-luxury-black tracking-widest">Grasse</text>
+                                    </svg>
+                                </div>
+                                <div className="absolute text-center">
+                                    <MapPin size={48} className="text-gold mx-auto mb-6 animate-bounce" strokeWidth={1} />
+                                    <h4 className="text-2xl font-display font-light uppercase tracking-widest mb-4">Grasse, France</h4>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Punto de Origen L'Essence</p>
+                                </div>
+                                <div className="absolute top-10 right-10 bg-white p-4 shadow-xl border border-gray-50 flex items-center gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center">
+                                        <Check size={14} className="text-gold" />
+                                    </div>
+                                    <span className="text-[9px] font-black uppercase tracking-widest">Importado Grasse</span>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
         </div>
