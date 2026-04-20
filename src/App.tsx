@@ -276,12 +276,14 @@ export default function App() {
       <section id="signature" className="bg-[#FBFBFB] section-padding border-y border-gray-50">
         <div className="max-w-7xl mx-auto flex flex-col lg:grid lg:grid-cols-12 gap-12 md:gap-24 items-center">
             <div className="w-full lg:col-span-7 flex justify-center">
-                <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="img-container-premium aspect-[4/3] md:aspect-[4/5] bg-white group shadow-2xl w-full max-w-[500px] lg:max-w-none">
-                    <img 
-                        src={STAR_SET.image} 
-                        alt="Signature Collection" 
-                        className="img-contained group-hover:scale-105 transition-transform duration-1000" 
-                        referrerPolicy="no-referrer" 
+                <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="img-container-premium aspect-[4/3] md:aspect-[4/5] bg-white group shadow-2xl w-full max-w-[500px] lg:max-w-none overflow-hidden">
+                    <video 
+                        src="https://res.cloudinary.com/drf2kj5cy/video/upload/v1776706491/intro.mp4_ngynpc.mp4"
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                     />
                 </motion.div>
             </div>
@@ -385,84 +387,36 @@ export default function App() {
                             Importamos maestría desde el epicentro mundial de la perfumería fina. Cada gota de L'Essence nace en Grasse, Francia, garantizando una complejidad y fijación inigualables.
                         </p>
                         
-                        <div className="grid grid-cols-2 gap-8 pt-10 border-t border-gray-100">
-                            <div className="space-y-2">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-gold">Ubicación</span>
-                                <p className="text-sm font-bold uppercase tracking-widest">Grasse, Côte d'Azur</p>
-                            </div>
-                            <div className="space-y-2">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-gold">Método</span>
-                                <p className="text-sm font-bold uppercase tracking-widest">Destilación Artesanal</p>
-                            </div>
+                        <div className="flex flex-col items-center text-center w-full pt-10 border-t border-gray-100">
+                            <a 
+                                href="https://maps.app.goo.gl/raCLk8WoEPxcdhHS6" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="btn-outline group inline-flex items-center justify-center min-w-[280px]"
+                            >
+                                DESCUBRIR MAPA →
+                            </a>
+                            <p className="text-[10px] md:text-[11px] uppercase tracking-[0.2em] text-gray-400 mt-6 max-w-sm font-medium leading-relaxed">
+                                Descubre de dónde provienen las bases de los perfumes que recibirás en casa.
+                            </p>
                         </div>
-
-                        <button 
-                            onClick={() => setShowMap(!showMap)}
-                            className="btn-outline mt-16 group"
-                        >
-                            {showMap ? 'VER DESTILERÍA' : 'DESCUBRIR MAPA'}
-                            <motion.div animate={{ x: showMap ? -5 : 5 }} transition={{ repeat: Infinity, duration: 1.5, repeatType: 'reverse' }}>
-                                <ArrowRight size={16} />
-                            </motion.div>
-                        </button>
                     </motion.div>
                 </div>
 
-                <div className="relative aspect-square lg:aspect-auto lg:h-[700px] group cursor-pointer" onClick={() => setShowMap(!showMap)}>
-                    <AnimatePresence mode="wait">
-                        {!showMap ? (
-                            <motion.div 
-                                key="image"
-                                initial={{ opacity: 0, scale: 1.1 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 1.1 }}
-                                transition={{ duration: 0.8 }}
-                                className="w-full h-full relative overflow-hidden shadow-2xl"
-                            >
-                                <img 
-                                    src="https://images.unsplash.com/photo-1515377274092-23f27f8cc930?auto=format&fit=crop&q=80&w=2600"
-                                    alt="Artisan Perfumery in Grasse"
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
-                                    referrerPolicy="no-referrer"
-                                />
-                                <div className="absolute inset-0 bg-luxury-black/10 group-hover:bg-transparent transition-colors duration-700" />
-                                <div className="absolute bottom-10 left-10 text-white z-10">
-                                    <span className="text-[9px] font-black uppercase tracking-[0.4em] mb-2 block">Atelier Grasse</span>
-                                    <p className="text-xl font-light italic">Tradición Francesa Pura</p>
-                                </div>
-                            </motion.div>
-                        ) : (
-                            <motion.div 
-                                key="map"
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                transition={{ duration: 0.8 }}
-                                className="w-full h-full bg-[#F5F2ED] border border-gray-100 shadow-2xl relative flex items-center justify-center p-12"
-                            >
-                                {/* SIMULATED PREMIUM MAP */}
-                                <div className="relative w-full h-full opacity-60">
-                                    <svg viewBox="0 0 100 100" className="w-full h-full text-luxury-black/10">
-                                        <path d="M20,20 Q50,0 80,20 Q100,50 80,80 Q50,100 20,80 Q0,50 20,20" fill="none" stroke="currentColor" strokeWidth="0.5" />
-                                        <path d="M30,30 Q50,40 70,30" fill="none" stroke="currentColor" strokeWidth="0.2" strokeDasharray="2,2" />
-                                        <circle cx="75" cy="70" r="1.5" className="fill-gold animate-pulse" />
-                                        <text x="78" y="70" className="text-[4px] font-black uppercase fill-luxury-black tracking-widest">Grasse</text>
-                                    </svg>
-                                </div>
-                                <div className="absolute text-center">
-                                    <MapPin size={48} className="text-gold mx-auto mb-6 animate-bounce" strokeWidth={1} />
-                                    <h4 className="text-2xl font-display font-light uppercase tracking-widest mb-4">Grasse, France</h4>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Punto de Origen L'Essence</p>
-                                </div>
-                                <div className="absolute top-10 right-10 bg-white p-4 shadow-xl border border-gray-50 flex items-center gap-4">
-                                    <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center">
-                                        <Check size={14} className="text-gold" />
-                                    </div>
-                                    <span className="text-[9px] font-black uppercase tracking-widest">Importado Grasse</span>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                <div className="relative aspect-square lg:aspect-auto lg:h-[700px] overflow-hidden shadow-2xl group">
+                    <video 
+                        src="https://res.cloudinary.com/drf2kj5cy/video/upload/v1776710706/freepik_create-a-video_2826693728_hsz0d8.mp4"
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+                    />
+                    <div className="absolute inset-0 bg-luxury-black/10" />
+                    <div className="absolute bottom-10 left-10 text-white z-10">
+                        <span className="text-[9px] font-black uppercase tracking-[0.4em] mb-2 block">Atelier Grasse</span>
+                        <p className="text-xl font-light italic">Tradición Francesa Pura</p>
+                    </div>
                 </div>
             </div>
         </div>
