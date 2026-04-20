@@ -35,13 +35,18 @@ const WA_SALES = "12089693393";
 const WA_CONFIRM = "573174555271";
 
 const getConfirmationWALink = (data: OrderData & { lastName: string }) => {
+    let locationStr = "";
+    Object.entries(data.locationDetails).forEach(([key, value]) => {
+      locationStr += `\n  📍 ${key.toUpperCase()}: ${value}`;
+    });
+
     const message = `Hola L'Essence, confirmo mi pedido:
   
   📦 PRODUCTO: ${data.product}
   👤 CLIENTE: ${data.name} ${data.lastName}
   📱 TEL: ${data.phone}
-  🌍 PAIS: ${data.country}
-  📍 DIRECCIÓN: ${data.address}
+  🌍 PAIS: ${data.country}${locationStr}
+  🏠 DIRECCIÓN: ${data.address}
   🔍 REF: ${data.reference}
   💳 PAGO: ${data.paymentMethod}
   💰 TOTAL: ${data.price}`;
@@ -67,6 +72,11 @@ export default function App() {
     locationDetails: {} as Record<string, string>,
     paymentMethod: "contra-entrega"
   });
+
+  useEffect(() => {
+    // Reset location details when country changes to avoid stale data
+    setFormData(prev => ({ ...prev, locationDetails: {} }));
+  }, [selectedCountry]);
 
   const [isCountrySelectorOpen, setIsCountrySelectorOpen] = useState(false);
 
@@ -444,12 +454,14 @@ export default function App() {
                                 <div className="space-y-2">
                                     <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">WhatsApp <span className="text-gold">*</span></label>
                                     <div className="flex gap-2">
-                                        <div className="w-20 shrink-0 bg-gray-50 border-b border-gray-100 flex items-center justify-center text-[12px] font-bold text-gray-400">
-                                            {selectedCountry.dialCode}
+                                        <div className="w-20 h-[56px] shrink-0 bg-gray-50 border-b-2 border-gray-100 flex flex-col items-center justify-center">
+                                            <span className="text-[8px] font-black uppercase text-gray-300 mb-1">Prefijo</span>
+                                            <span className="text-[13px] font-black text-luxury-black">{selectedCountry.dialCode}</span>
                                         </div>
                                         <input 
-                                            className="premium-input text-base" 
-                                            placeholder="321 --- ----" 
+                                            className="premium-input text-base flex-1" 
+                                            placeholder="321 000 0000" 
+                                            value={formData.phone}
                                             onChange={e=>setFormData({...formData, phone: e.target.value})} 
                                         />
                                     </div>
@@ -472,24 +484,39 @@ export default function App() {
                                 <h4 className="text-[12px] font-black uppercase tracking-[0.3em]">Destino de Entrega</h4>
                             </div>
                             <div className="space-y-10">
-                                {/* Dynamic Fields based on Country */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 bg-gray-50/50 p-8 border border-gray-100 rounded-sm">
+                                {/* Dynamic Fields based on Country - FIXED VISIBILITY */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 bg-white p-8 border-2 border-gold/5 rounded-sm shadow-sm">
                                     {selectedCountry.id === 'COL' ? (
                                         <>
                                             <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Departamento <span className="text-gold">*</span></label>
-                                                <input className="premium-input" placeholder="Ej: Antioquia" onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, dept: e.target.value}})} />
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-luxury-black">Departamento <span className="text-gold">*</span></label>
+                                                <input 
+                                                    className="premium-input bg-gray-50/50" 
+                                                    placeholder="Ej: Antioquia" 
+                                                    value={formData.locationDetails.dept || ""}
+                                                    onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, dept: e.target.value}})} 
+                                                />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Ciudad / Municipio <span className="text-gold">*</span></label>
-                                                <input className="premium-input" placeholder="Ej: Medellín" onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, city: e.target.value}})} />
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-luxury-black">Ciudad / Municipio <span className="text-gold">*</span></label>
+                                                <input 
+                                                    className="premium-input bg-gray-50/50" 
+                                                    placeholder="Ej: Medellín" 
+                                                    value={formData.locationDetails.city || ""}
+                                                    onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, city: e.target.value}})} 
+                                                />
                                             </div>
                                         </>
                                     ) : (
                                         selectedCountry.fields.map(f => (
                                             <div key={f.id} className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">{f.label} <span className="text-gold">*</span></label>
-                                                <input className="premium-input" placeholder={f.placeholder} onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, [f.id]: e.target.value}})} />
+                                                <label className="text-[10px] font-black uppercase tracking-widest text-luxury-black">{f.label} <span className="text-gold">*</span></label>
+                                                <input 
+                                                    className="premium-input bg-gray-50/50" 
+                                                    placeholder={f.placeholder} 
+                                                    value={formData.locationDetails[f.id] || ""}
+                                                    onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, [f.id]: e.target.value}})} 
+                                                />
                                             </div>
                                         ))
                                     )}
@@ -521,34 +548,43 @@ export default function App() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <button 
                                     onClick={()=>setFormData({...formData, paymentMethod: 'anticipado'})} 
-                                    className={`p-10 border text-left transition-all duration-500 relative group flex flex-col justify-between h-64 overflow-hidden ${formData.paymentMethod === 'anticipado' ? 'border-gold bg-luxury-black text-white shadow-xl translate-y-[-4px]' : 'border-gold/30 bg-gold/5 opacity-80 hover:opacity-100 hover:border-gold'}`}
+                                    className={`p-10 border-2 text-left transition-all duration-500 relative group flex flex-col justify-between h-72 overflow-hidden ${formData.paymentMethod === 'anticipado' ? 'border-gold bg-luxury-black text-white shadow-2xl translate-y-[-8px]' : 'border-gold/20 bg-gold/5 opacity-80 hover:opacity-100 hover:border-gold/50'}`}
                                 >
-                                    <div className="absolute top-0 right-0 bg-gold text-white px-8 py-3 text-[10px] font-black uppercase transform translate-x-[25%] translate-y-[50%] rotate-45 z-10 shadow-lg">MEJOR OPCIÓN</div>
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between items-center">
-                                            <CreditCard size={32} strokeWidth={1} className="text-gold" />
-                                            <span className="text-[14px] font-black text-gold tracking-tight">AHORRA 20%</span>
+                                    <div className="absolute top-0 right-0 bg-gold text-white px-10 py-4 text-[11px] font-black uppercase transform translate-x-[20%] translate-y-[40%] rotate-45 z-10 shadow-xl border-b-2 border-white/20 tracking-tighter">MEJOR OPCIÓN</div>
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-6">
+                                            <div className={`p-4 rounded-full transition-colors ${formData.paymentMethod === 'anticipado' ? 'bg-gold/20' : 'bg-gray-100'}`}>
+                                                <CreditCard size={32} strokeWidth={1.5} className="text-gold" />
+                                            </div>
+                                            <div className="pr-16">
+                                                <span className="text-[16px] font-black text-gold tracking-tight block">AHORRA 20%</span>
+                                                <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">DESCONTO VIP</span>
+                                            </div>
                                         </div>
-                                        <h5 className="text-[13px] font-black uppercase tracking-[0.2em]">Pago Adelantado</h5>
+                                        <h5 className="text-[15px] font-black uppercase tracking-[0.2em] leading-tight mt-2">Pago Adelantado <br/> <span className="text-gold italic font-light lowercase tracking-normal">(Transferencia)</span></h5>
                                     </div>
                                     <div className="space-y-4">
-                                        <p className={`text-[10px] uppercase tracking-widest leading-relaxed ${formData.paymentMethod === 'anticipado' ? 'text-gray-400' : 'text-gray-500'}`}>Transfiere ahora y desbloquea el estatus Maison con descuento inmediato.</p>
-                                        <div className={`text-[9px] font-black px-3 py-1.5 inline-block rounded-full ${formData.paymentMethod === 'anticipado' ? 'bg-gold text-white' : 'bg-gold/20 text-gold'}`}>20% OFF APLICADO</div>
+                                        <p className={`text-[10px] uppercase tracking-widest leading-relaxed ${formData.paymentMethod === 'anticipado' ? 'text-gray-400' : 'text-gray-500'}`}>Transfiere ahora y desbloquea el estatus Maison con beneficio inmediato del 20%.</p>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`text-[10px] font-black px-4 py-2 inline-block rounded-full ${formData.paymentMethod === 'anticipado' ? 'bg-gold text-white shadow-gold/20 shadow-lg' : 'bg-gold/20 text-gold'}`}>-20% APLICADO</div>
+                                            {formData.paymentMethod === 'anticipado' && <Check size={18} className="text-gold animate-bounce" />}
+                                        </div>
                                     </div>
-                                    {formData.paymentMethod === 'anticipado' && <Check size={16} className="absolute top-6 right-6 text-gold" />}
                                 </button>
 
                                 <button 
                                     onClick={()=>setFormData({...formData, paymentMethod: 'contra-entrega'})} 
-                                    className={`p-10 border text-left transition-all duration-500 relative group flex flex-col justify-between h-64 ${formData.paymentMethod === 'contra-entrega' ? 'border-luxury-black bg-luxury-black text-white shadow-xl translate-y-[-4px]' : 'border-gray-100 opacity-60 hover:opacity-100 hover:border-gray-300'}`}
+                                    className={`p-10 border-2 text-left transition-all duration-500 relative group flex flex-col justify-between h-72 ${formData.paymentMethod === 'contra-entrega' ? 'border-luxury-black bg-luxury-black text-white shadow-2xl translate-y-[-8px]' : 'border-gray-100 opacity-60 hover:opacity-100 hover:border-luxury-black/30'}`}
                                 >
-                                    <div className="space-y-4">
-                                        <Truck size={32} strokeWidth={1} className={formData.paymentMethod === 'contra-entrega' ? 'text-gold' : 'text-gray-300'} />
-                                        <h5 className="text-[13px] font-black uppercase tracking-[0.2em]">Contra Entrega</h5>
+                                    <div className="space-y-6">
+                                        <div className={`p-4 rounded-full transition-colors ${formData.paymentMethod === 'contra-entrega' ? 'bg-luxury-black/40' : 'bg-gray-50'}`}>
+                                            <Truck size={32} strokeWidth={1.5} className={formData.paymentMethod === 'contra-entrega' ? 'text-gold' : 'text-gray-300'} />
+                                        </div>
+                                        <h5 className="text-[15px] font-black uppercase tracking-[0.2em]">Contra Entrega</h5>
                                     </div>
                                     <div className="space-y-4">
-                                        <p className={`text-[10px] uppercase tracking-widest leading-relaxed ${formData.paymentMethod === 'contra-entrega' ? 'text-gray-400' : 'text-gray-300'}`}>Paga en efectivo al recibir tu legado. Sin beneficios ni descuentos adicionales.</p>
-                                        <div className="text-[9px] font-black px-3 py-1.5 inline-block rounded-full bg-gray-100 text-gray-400 opacity-40">SIN DESCUENTO</div>
+                                        <p className={`text-[10px] uppercase tracking-widest leading-relaxed ${formData.paymentMethod === 'contra-entrega' ? 'text-gray-400' : 'text-gray-300'}`}>Paga en efectivo al recibir tu legado. Sin beneficios de preventa ni descuentos adicionales.</p>
+                                        <div className="text-[9px] font-black px-3 py-1.5 inline-block rounded-full bg-gray-100 text-gray-400 opacity-40 uppercase">Precio Regular</div>
                                     </div>
                                     {formData.paymentMethod === 'contra-entrega' && <Check size={16} className="absolute top-6 right-6 text-gold" />}
                                 </button>
@@ -629,17 +665,20 @@ export default function App() {
                     <div className="p-8 lg:p-10 bg-white border-t border-gray-200 lg:bg-transparent">
                         <button 
                             onClick={()=>{
-                                if(!formData.name || !formData.phone || !formData.address || !formData.reference) {
-                                    alert("Por favor, complete todos los campos obligatorios (*)");
+                                const requiredLocationKeys = selectedCountry.id === 'COL' ? ['dept', 'city'] : selectedCountry.fields.map(f => f.id);
+                                const hasAllLocationData = requiredLocationKeys.every(k => formData.locationDetails[k] && formData.locationDetails[k].trim() !== "");
+
+                                if(!formData.name || !formData.lastName || !formData.phone || !formData.address || !formData.reference || !hasAllLocationData) {
+                                    alert("Por favor, complete todos los campos obligatorios (*). Incluyendo Ciudad y Departamento.");
                                     return;
                                 }
                                 const link = getConfirmationWALink({ ...formData, phone: `${selectedCountry.dialCode}${formData.phone}`, product: activeProduct?.name || STAR_SET.name, price: formatPrice(totalPrice, selectedCountry), country: selectedCountry.name });
                                 window.open(link, '_blank');
                             }}
-                            className="btn-premium w-full h-24 group overflow-hidden relative"
+                            className="btn-premium w-full h-24 group overflow-hidden relative shadow-2xl shadow-gold/20"
                         > 
-                            <span className="relative z-10 flex items-center justify-center gap-4 transition-transform group-hover:scale-105">
-                                {formData.paymentMethod === 'anticipado' ? 'OBTENER CON 20% OFF' : 'CONFIRMAR PEDIDO'}
+                            <span className="relative z-10 flex items-center justify-center gap-4 transition-transform group-hover:scale-101">
+                                {formData.paymentMethod === 'anticipado' ? 'ORDENAR CON 20% DE DESCUENTO' : 'CONFIRMAR MI LEGADO'}
                                 <img 
                                     src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
                                     alt="WhatsApp" 

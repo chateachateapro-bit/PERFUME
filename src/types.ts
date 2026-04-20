@@ -44,6 +44,7 @@ export interface OrderData {
   profileName?: string;
   protagonists?: string[];
   name: string;
+  lastName: string;
   phone: string;
   email: string;
   address: string;
