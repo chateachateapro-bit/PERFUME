@@ -68,15 +68,36 @@ export default function App() {
 
   // Form State
   const [formData, setFormData] = useState({
-    name: "", lastName: "", phone: "", email: "", address: "", reference: "",
+    name: "", 
+    lastName: "", 
+    phone: "", 
+    email: "", 
+    address: "", 
+    reference: "",
     locationDetails: {} as Record<string, string>,
     paymentMethod: "contra-entrega"
   });
 
   useEffect(() => {
     // Reset location details when country changes to avoid stale data
+    // but ensure standard fields are handled
     setFormData(prev => ({ ...prev, locationDetails: {} }));
   }, [selectedCountry]);
+
+  // Validation Logic
+  const isFormValid = () => {
+    const requiredLocationKeys = selectedCountry.id === 'COL' ? ['dept', 'city'] : selectedCountry.fields.map(f => f.id);
+    const hasAllLocationData = requiredLocationKeys.every(k => formData.locationDetails[k] && formData.locationDetails[k].trim() !== "");
+    
+    return (
+      formData.name.trim() !== "" &&
+      formData.lastName.trim() !== "" &&
+      formData.phone.trim() !== "" &&
+      formData.address.trim() !== "" &&
+      formData.reference.trim() !== "" &&
+      hasAllLocationData
+    );
+  };
 
   const [isCountrySelectorOpen, setIsCountrySelectorOpen] = useState(false);
 
@@ -89,8 +110,11 @@ export default function App() {
   useEffect(() => {
     if (isCheckoutOpen || showTest) {
       document.body.style.overflow = 'hidden';
+      // Fallback for some browsers to ensure the overlay captures everything
+      document.documentElement.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
     }
   }, [isCheckoutOpen, showTest]);
 
@@ -100,7 +124,7 @@ export default function App() {
   };
 
   const currentPrice = activeProduct?.price || STAR_SET.price;
-  const shippingCost = activeProduct?.id === 'set-completo' ? 0 : 10990;
+  const shippingCost = (activeProduct?.id === 'set-completo' || !activeProduct) ? 0 : 10990;
   const discountRate = formData.paymentMethod === 'anticipado' ? 0.2 : 0;
   const discountAmount = currentPrice * discountRate;
   const totalPrice = (currentPrice - discountAmount) + shippingCost;
@@ -120,6 +144,53 @@ export default function App() {
     setActiveProduct(product);
     setIsCheckoutOpen(true);
   };
+
+  const handleMainCTA = () => {
+    if (!isFormValid()) {
+      alert("Por favor, complete todos los campos obligatorios (*). Es vital para asegurar su entrega Maison.");
+      return;
+    }
+
+    const fullPhone = `${selectedCountry.dialCode}${formData.phone.replace(/\s+/g, '')}`;
+
+    if (formData.paymentMethod === 'anticipado') {
+      // REDIRECTION TO MERCADO PAGO for Advanced Payment
+      window.open('https://link.mercadopago.com.co/lessen', '_blank');
+      
+      // We also send the manual confirmation to the WA number as a backup of the intent
+      const link = getConfirmationWALink({ 
+        ...formData, 
+        phone: fullPhone, 
+        product: activeProduct?.name || STAR_SET.name, 
+        price: formatPrice(totalPrice, selectedCountry), 
+        country: selectedCountry.name 
+      });
+      
+      setTimeout(() => {
+        window.open(link, '_blank');
+      }, 800);
+    } else {
+      // STANDARD COD Flow - Just WhatsApp
+      const link = getConfirmationWALink({ 
+        ...formData, 
+        phone: fullPhone, 
+        product: activeProduct?.name || STAR_SET.name, 
+        price: formatPrice(totalPrice, selectedCountry), 
+        country: selectedCountry.name 
+      });
+      window.open(link, '_blank');
+    }
+  };
+
+  const [scrolledVal, setScrolledVal] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+      setScrolledVal(window.scrollY > 40);
+    }
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <div className="min-h-screen bg-white font-sans text-luxury-black antialiased custom-scrollbar overflow-x-hidden">
@@ -664,29 +735,18 @@ export default function App() {
 
                     <div className="p-8 lg:p-10 bg-white border-t border-gray-200 lg:bg-transparent">
                         <button 
-                            onClick={()=>{
-                                const requiredLocationKeys = selectedCountry.id === 'COL' ? ['dept', 'city'] : selectedCountry.fields.map(f => f.id);
-                                const hasAllLocationData = requiredLocationKeys.every(k => formData.locationDetails[k] && formData.locationDetails[k].trim() !== "");
-
-                                if(!formData.name || !formData.lastName || !formData.phone || !formData.address || !formData.reference || !hasAllLocationData) {
-                                    alert("Por favor, complete todos los campos obligatorios (*). Incluyendo Ciudad y Departamento.");
-                                    return;
-                                }
-                                const link = getConfirmationWALink({ ...formData, phone: `${selectedCountry.dialCode}${formData.phone}`, product: activeProduct?.name || STAR_SET.name, price: formatPrice(totalPrice, selectedCountry), country: selectedCountry.name });
-                                window.open(link, '_blank');
-                            }}
-                            className="btn-premium w-full h-24 group overflow-hidden relative shadow-2xl shadow-gold/20"
+                            onClick={handleMainCTA}
+                            className={`btn-premium w-full h-24 group overflow-hidden relative shadow-2xl transition-all duration-300 ${formData.paymentMethod === 'anticipado' ? 'shadow-gold/40 scale-[1.02]' : 'shadow-luxury-black/10'}`}
                         > 
-                            <span className="relative z-10 flex items-center justify-center gap-4 transition-transform group-hover:scale-101">
-                                {formData.paymentMethod === 'anticipado' ? 'ORDENAR CON 20% DE DESCUENTO' : 'CONFIRMAR MI LEGADO'}
-                                <img 
-                                    src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
-                                    alt="WhatsApp" 
-                                    className="w-7 h-7 brightness-0 invert"
-                                    referrerPolicy="no-referrer"
-                                />
+                            <span className="relative z-10 flex flex-col items-center justify-center gap-1 transition-transform group-hover:scale-101">
+                                <span className="text-[12px] font-black uppercase tracking-widest">
+                                    {formData.paymentMethod === 'anticipado' ? 'PAGAR AHORA CON 20% OFF' : 'FINALIZAR COMPRA'}
+                                </span>
+                                {formData.paymentMethod === 'anticipado' && (
+                                    <span className="text-[8px] font-bold opacity-70 tracking-widest leading-none">REDIRECCIÓN SEGURA A MERCADO PAGO</span>
+                                )}
                             </span>
-                            <div className={`absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ${formData.paymentMethod === 'anticipado' ? 'bg-[#25D366]' : 'bg-gold'}`} />
+                            <div className={`absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ${formData.paymentMethod === 'anticipado' ? 'bg-[#009EE3]' : 'bg-gold'}`} />
                         </button>
                     </div>
                 </div>
