@@ -76,12 +76,20 @@ export default function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (isCheckoutOpen || showTest) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [isCheckoutOpen, showTest]);
+
   const toggleWishlist = (id: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
     setWishlist(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
-  const currentPrice = activeProduct?.id === 'set-completo' ? STAR_SET.price : 59900;
+  const currentPrice = activeProduct?.price || STAR_SET.price;
   const shippingCost = activeProduct?.id === 'set-completo' ? 0 : 10990;
   const discountRate = formData.paymentMethod === 'anticipado' ? 0.2 : 0;
   const discountAmount = currentPrice * discountRate;
@@ -262,7 +270,7 @@ export default function App() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8">
                 {FRAGRANCES.map(f => (
-                    <div key={f.id} className="group cursor-pointer" onClick={() => setActiveProduct(f)}>
+                    <div key={f.id} className="group cursor-pointer" onClick={() => openCheckout(f)}>
                         <div className="img-container-premium aspect-square md:aspect-[4/5] mb-8 group-hover:shadow-xl transition-all duration-700 bg-[#FBFBFB]">
                             <img src={f.image} alt={f.name} className="img-contained group-hover:scale-105 transition-transform duration-1000" />
                             <button onClick={(e) => toggleWishlist(f.id, e)} className="absolute top-4 right-4 text-gray-200 z-10 hover:text-gold transition-colors">
@@ -272,8 +280,8 @@ export default function App() {
                         <div className="text-center">
                             <span className="text-[8px] font-black text-gray-200 uppercase tracking-[0.4em] mb-3 block">Legado {f.name}</span>
                             <h4 className="h-card mb-4">{f.name}</h4>
-                            <p className="text-lg md:text-xl font-black tracking-tight mb-6">{formatPrice(59900, selectedCountry)}</p>
-                            <button className="text-[9px] font-black uppercase tracking-widest text-gold underline underline-offset-8 decoration-gold/20 hover:decoration-gold transition-all">Detalles</button>
+                            <p className="text-lg md:text-xl font-black tracking-tight mb-6">{formatPrice(f.price, selectedCountry)}</p>
+                            <button className="btn-premium py-3 px-6 text-[8px] opacity-0 group-hover:opacity-100 transition-all">ORDENAR AHORA</button>
                         </div>
                     </div>
                 ))}
@@ -373,108 +381,275 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* ONE-PAGE PREMIUM CHECKOUT */}
+      {/* ONE-PAGE PREMIUM CHECKOUT - CRO OPTIMIZED OVERHAUL */}
       <AnimatePresence>
         {isCheckoutOpen && (
           <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsCheckoutOpen(false)} className="fixed inset-0 bg-luxury-black/90 backdrop-blur-md z-[500]" />
-            <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", damping: 35 }} className="fixed right-0 top-0 h-full w-full max-w-xl bg-white z-[510] flex flex-col shadow-2xl overflow-hidden">
-                <div className="p-10 border-b border-gray-50 flex justify-between items-center">
-                    <div>
-                        <h3 className="text-xl font-black tracking-widest uppercase">One-Page Checkout</h3>
-                        <p className="text-[9px] font-bold text-gold uppercase tracking-[0.3em] mt-2">Maison L'Essence Secure Server</p>
-                    </div>
-                    <button onClick={() => setIsCheckoutOpen(false)} className="p-2 hover:rotate-90 transition-transform"><X size={24} /></button>
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }} 
+              onClick={() => setIsCheckoutOpen(false)} 
+              className="fixed inset-0 bg-luxury-black/95 backdrop-blur-md z-[500]" 
+            />
+            <motion.div 
+              initial={{ x: "100%" }} 
+              animate={{ x: 0 }} 
+              exit={{ x: "100%" }} 
+              transition={{ type: "spring", damping: 40, stiffness: 300 }} 
+              className="fixed right-0 top-0 h-full w-full max-w-4xl bg-white z-[510] flex flex-col lg:flex-row shadow-2xl overflow-y-auto lg:overflow-hidden"
+            >
+                {/* Header for Mobile/Global visibility */}
+                <div className="lg:hidden sticky top-0 left-0 right-0 p-8 border-b border-gray-100 flex justify-between items-center bg-white z-50">
+                    <h3 className="text-lg font-black uppercase tracking-widest">Ritual de Compra</h3>
+                    <button onClick={() => setIsCheckoutOpen(false)} className="p-2"><X size={24} /></button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-10 md:p-14 custom-scrollbar space-y-16">
-                    {/* Item Summary */}
-                    <div className="flex items-center gap-8 pb-10 border-b border-gray-50">
-                        <div className="w-24 h-32 bg-[#FBFBFB] flex items-center justify-center p-4">
-                            <img src={activeProduct?.image || STAR_SET.image} className="img-contained" />
-                        </div>
-                        <div>
-                            <h4 className="text-[12px] font-black uppercase mb-1">{activeProduct?.name || STAR_SET.name}</h4>
-                            <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest leading-loose">{activeProduct?.presentation}</p>
-                        </div>
-                    </div>
-
-                    {/* Form Fields */}
-                    <div className="space-y-12">
-                        <div className="space-y-8">
-                            <h5 className="premium-label text-gold border-b border-gold/10 pb-4">Identidad & Contacto</h5>
-                            <div className="grid grid-cols-2 gap-8">
-                                <div className="space-y-1"><label className="premium-label">Nombre</label><input className="premium-input" placeholder="Nombre" onChange={e=>setFormData({...formData, name: e.target.value})} /></div>
-                                <div className="space-y-1"><label className="premium-label">Apellidos</label><input className="premium-input" placeholder="Apellidos" onChange={e=>setFormData({...formData, lastName: e.target.value})} /></div>
+                {/* LEFT SIDE: FORM (70% WIDTH ON DESKTOP) */}
+                <div className="flex-1 lg:overflow-y-auto custom-scrollbar bg-white">
+                    <div className="p-8 md:p-14 lg:p-20 space-y-20">
+                        <div className="hidden lg:flex justify-between items-start mb-20">
+                            <div>
+                                <h3 className="text-2xl font-black tracking-widest uppercase">One-Page Checkout</h3>
+                                <p className="text-[10px] font-bold text-luxury-gold uppercase tracking-[0.4em] mt-3">Experiencia Maison Segura</p>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-1"><label className="premium-label">Teléfono WhatsApp</label><input className="premium-input" placeholder="+57 ---" onChange={e=>setFormData({...formData, phone: e.target.value})} /></div>
+                            <button onClick={() => setIsCheckoutOpen(false)} className="p-4 hover:bg-gray-50 rounded-full transition-all group">
+                                <X size={28} className="group-hover:rotate-90 transition-transform duration-500" />
+                            </button>
+                        </div>
+
+                        {/* Section 1: Identidad */}
+                        <div className="space-y-12">
+                            <div className="flex items-center gap-4">
+                                <span className="w-8 h-8 rounded-full border border-gold flex items-center justify-center text-[11px] font-black text-gold">01</span>
+                                <h4 className="text-[12px] font-black uppercase tracking-[0.3em]">Identidad del Cliente</h4>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Nombres <span className="text-gold">*</span></label>
+                                    <input 
+                                        className="premium-input text-base" 
+                                        placeholder="Ej: Juan Antonio" 
+                                        onChange={e=>setFormData({...formData, name: e.target.value})} 
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Apellidos <span className="text-gold">*</span></label>
+                                    <input 
+                                        className="premium-input text-base" 
+                                        placeholder="Ej: Rodríguez Pérez" 
+                                        onChange={e=>setFormData({...formData, lastName: e.target.value})} 
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">WhatsApp <span className="text-gold">*</span></label>
+                                    <div className="flex gap-2">
+                                        <div className="w-20 shrink-0 bg-gray-50 border-b border-gray-100 flex items-center justify-center text-[12px] font-bold text-gray-400">
+                                            {selectedCountry.dialCode}
+                                        </div>
+                                        <input 
+                                            className="premium-input text-base" 
+                                            placeholder="321 --- ----" 
+                                            onChange={e=>setFormData({...formData, phone: e.target.value})} 
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Email (Opcional)</label>
+                                    <input 
+                                        className="premium-input text-base" 
+                                        placeholder="maison@ejemplo.com" 
+                                        onChange={e=>setFormData({...formData, email: e.target.value})} 
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        <div className="space-y-8 pt-8">
-                            <h5 className="premium-label text-gold border-b border-gold/10 pb-4">Logística de Entrega</h5>
-                            {selectedCountry.id === 'COL' && (
-                                <div className="grid grid-cols-2 gap-8">
-                                    <div className="space-y-1"><label className="premium-label">Departamento</label><input className="premium-input" placeholder="Departamento" onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, dept: e.target.value}})} /></div>
-                                    <div className="space-y-1"><label className="premium-label">Ciudad</label><input className="premium-input" placeholder="Ciudad" onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, city: e.target.value}})} /></div>
+                        {/* Section 2: Destino */}
+                        <div className="space-y-12 border-t border-gray-50 pt-16">
+                            <div className="flex items-center gap-4">
+                                <span className="w-8 h-8 rounded-full border border-gold flex items-center justify-center text-[11px] font-black text-gold">02</span>
+                                <h4 className="text-[12px] font-black uppercase tracking-[0.3em]">Destino de Entrega</h4>
+                            </div>
+                            <div className="space-y-10">
+                                {/* Dynamic Fields based on Country */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 bg-gray-50/50 p-8 border border-gray-100 rounded-sm">
+                                    {selectedCountry.id === 'COL' ? (
+                                        <>
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Departamento <span className="text-gold">*</span></label>
+                                                <input className="premium-input" placeholder="Ej: Antioquia" onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, dept: e.target.value}})} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Ciudad / Municipio <span className="text-gold">*</span></label>
+                                                <input className="premium-input" placeholder="Ej: Medellín" onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, city: e.target.value}})} />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        selectedCountry.fields.map(f => (
+                                            <div key={f.id} className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">{f.label} <span className="text-gold">*</span></label>
+                                                <input className="premium-input" placeholder={f.placeholder} onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, [f.id]: e.target.value}})} />
+                                            </div>
+                                        ))
+                                    )}
                                 </div>
-                            )}
-                            {selectedCountry.id !== 'COL' && (
-                                <div className="grid grid-cols-2 gap-8">
-                                    {selectedCountry.fields.map(f => (
-                                        <div key={f.id} className="space-y-1"><label className="premium-label">{f.label}</label><input className="premium-input" placeholder={f.placeholder} onChange={e=>setFormData({...formData, locationDetails: {...formData.locationDetails, [f.id]: e.target.value}})} /></div>
-                                    ))}
+
+                                <div className="space-y-8">
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Dirección Completa <span className="text-gold">*</span></label>
+                                        <input className="premium-input" placeholder="Calle, Carrera, Conjunto, Apto..." onChange={e=>setFormData({...formData, address: e.target.value})} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 italic">Punto de Referencia Obligatorio <span className="text-gold font-black">*</span></label>
+                                        <textarea 
+                                            className="premium-input min-h-[100px] py-4" 
+                                            placeholder="Tienda de la esquina, frente al parque, color de fachada, portón eléctrico..." 
+                                            onChange={e=>setFormData({...formData, reference: e.target.value})} 
+                                        />
+                                    </div>
                                 </div>
-                            )}
-                            <div className="space-y-1"><label className="premium-label">Dirección Exacta</label><input className="premium-input" placeholder="Calle, Carrera, Conjunto, Apto..." onChange={e=>setFormData({...formData, address: e.target.value})} /></div>
-                            <div className="space-y-1"><label className="premium-label">Punto de Referencia <span className="text-gold font-black">*Obligatorio</span></label><input className="premium-input" placeholder="Tienda cercana, color casa, etc..." onChange={e=>setFormData({...formData, reference: e.target.value})} /></div>
+                            </div>
                         </div>
 
-                        <div className="space-y-8 pt-8">
-                            <h5 className="premium-label text-gold border-b border-gold/10 pb-4">Ritual de Pago</h5>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <button onClick={()=>setFormData({...formData, paymentMethod: 'contra-entrega'})} className={`p-8 border flex flex-col gap-4 text-left group transition-all ${formData.paymentMethod === 'contra-entrega' ? 'border-gold bg-gold/5' : 'border-gray-100 opacity-40 hover:opacity-100 hover:border-gray-300 pointer-events-auto'}`}>
-                                    <Truck size={24} className={formData.paymentMethod === 'contra-entrega' ? 'text-gold' : 'text-gray-300'} />
-                                    <div><span className="text-[10px] font-black uppercase tracking-widest">Contra Entrega</span><p className="text-[8px] text-gray-300 uppercase tracking-widest mt-1">Efectivo al recibir</p></div>
+                        {/* Section 3: Pago */}
+                        <div className="space-y-12 border-t border-gray-50 pt-16">
+                            <div className="flex items-center gap-4">
+                                <span className="w-8 h-8 rounded-full border border-gold flex items-center justify-center text-[11px] font-black text-gold">03</span>
+                                <h4 className="text-[12px] font-black uppercase tracking-[0.3em]">Ritual de Pago</h4>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <button 
+                                    onClick={()=>setFormData({...formData, paymentMethod: 'anticipado'})} 
+                                    className={`p-10 border text-left transition-all duration-500 relative group flex flex-col justify-between h-64 overflow-hidden ${formData.paymentMethod === 'anticipado' ? 'border-gold bg-luxury-black text-white shadow-xl translate-y-[-4px]' : 'border-gold/30 bg-gold/5 opacity-80 hover:opacity-100 hover:border-gold'}`}
+                                >
+                                    <div className="absolute top-0 right-0 bg-gold text-white px-8 py-3 text-[10px] font-black uppercase transform translate-x-[25%] translate-y-[50%] rotate-45 z-10 shadow-lg">MEJOR OPCIÓN</div>
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center">
+                                            <CreditCard size={32} strokeWidth={1} className="text-gold" />
+                                            <span className="text-[14px] font-black text-gold tracking-tight">AHORRA 20%</span>
+                                        </div>
+                                        <h5 className="text-[13px] font-black uppercase tracking-[0.2em]">Pago Adelantado</h5>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <p className={`text-[10px] uppercase tracking-widest leading-relaxed ${formData.paymentMethod === 'anticipado' ? 'text-gray-400' : 'text-gray-500'}`}>Transfiere ahora y desbloquea el estatus Maison con descuento inmediato.</p>
+                                        <div className={`text-[9px] font-black px-3 py-1.5 inline-block rounded-full ${formData.paymentMethod === 'anticipado' ? 'bg-gold text-white' : 'bg-gold/20 text-gold'}`}>20% OFF APLICADO</div>
+                                    </div>
+                                    {formData.paymentMethod === 'anticipado' && <Check size={16} className="absolute top-6 right-6 text-gold" />}
                                 </button>
-                                <button onClick={()=>setFormData({...formData, paymentMethod: 'anticipado'})} className={`p-8 border flex flex-col gap-4 text-left relative overflow-hidden transition-all ${formData.paymentMethod === 'anticipado' ? 'border-gold bg-gold/5' : 'border-gray-100 opacity-40 hover:opacity-100 hover:border-gray-300 pointer-events-auto'}`}>
-                                    <div className="absolute top-0 right-0 bg-gold text-white px-2 py-1 text-[7px] font-black uppercase transform translate-x-2 translate-y-2 rotate-45">OFF 20%</div>
-                                    <CreditCard size={24} className={formData.paymentMethod === 'anticipado' ? 'text-gold' : 'text-gray-300'} />
-                                    <div><span className="text-[10px] font-black uppercase tracking-widest">Pago Adelantado</span><p className="text-[8px] text-gray-300 uppercase tracking-widest mt-1">Transferencia / Tarjeta</p></div>
+
+                                <button 
+                                    onClick={()=>setFormData({...formData, paymentMethod: 'contra-entrega'})} 
+                                    className={`p-10 border text-left transition-all duration-500 relative group flex flex-col justify-between h-64 ${formData.paymentMethod === 'contra-entrega' ? 'border-luxury-black bg-luxury-black text-white shadow-xl translate-y-[-4px]' : 'border-gray-100 opacity-60 hover:opacity-100 hover:border-gray-300'}`}
+                                >
+                                    <div className="space-y-4">
+                                        <Truck size={32} strokeWidth={1} className={formData.paymentMethod === 'contra-entrega' ? 'text-gold' : 'text-gray-300'} />
+                                        <h5 className="text-[13px] font-black uppercase tracking-[0.2em]">Contra Entrega</h5>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <p className={`text-[10px] uppercase tracking-widest leading-relaxed ${formData.paymentMethod === 'contra-entrega' ? 'text-gray-400' : 'text-gray-300'}`}>Paga en efectivo al recibir tu legado. Sin beneficios ni descuentos adicionales.</p>
+                                        <div className="text-[9px] font-black px-3 py-1.5 inline-block rounded-full bg-gray-100 text-gray-400 opacity-40">SIN DESCUENTO</div>
+                                    </div>
+                                    {formData.paymentMethod === 'contra-entrega' && <Check size={16} className="absolute top-6 right-6 text-gold" />}
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="p-10 md:p-14 bg-white border-t border-gray-100 flex flex-col gap-10">
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-end opacity-20"><span className="text-[10px] font-black uppercase tracking-[0.2em]">Merchandise Subtotal</span><span className="text-xl font-sans tracking-tight">{formatPrice(currentPrice, selectedCountry)}</span></div>
-                        <div className="flex justify-between items-end"><span className={`text-[10px] font-black uppercase tracking-[0.2em] ${shippingCost === 0 ? 'text-gold' : 'opacity-20'}`}>Maison Courier Priority</span><span className={`text-xl font-sans tracking-tight ${shippingCost === 0 ? 'text-gold font-black' : 'opacity-20'}`}>{shippingCost === 0 ? "GRATIS" : formatPrice(shippingCost, selectedCountry)}</span></div>
-                        {formData.paymentMethod === 'anticipado' && (
-                            <div className="flex justify-between items-end"><span className="text-[10px] font-black uppercase tracking-[0.2em] text-gold animate-pulse">Descuento Anticipado (-20%)</span><span className="text-xl font-black text-gold">-{formatPrice(discountAmount, selectedCountry)}</span></div>
-                        )}
+                {/* RIGHT SIDE: SUMMARY (STAYS STICKY IN VIEW) */}
+                <div className="w-full lg:w-[420px] bg-gray-50 flex flex-col border-l border-gray-100 lg:h-full lg:overflow-y-auto custom-scrollbar">
+                    <div className="p-10 flex-1 space-y-12">
+                        <div className="flex items-center gap-6 pb-12 border-b border-gray-200">
+                            <div className="w-24 h-32 bg-white flex items-center justify-center p-4 border border-gray-100 shadow-sm relative overflow-hidden group">
+                                <img src={activeProduct?.image || STAR_SET.image} alt="Selected Product" className="img-contained transition-transform duration-700 group-hover:scale-110" />
+                                {formData.paymentMethod === 'anticipado' && (
+                                    <div className="absolute top-0 left-0 bg-gold text-white text-[8px] font-black px-2 py-1 uppercase scale-90 -translate-x-1 -translate-y-1">VIP</div>
+                                )}
+                            </div>
+                            <div className="flex-1">
+                                <h4 className="text-[11px] font-black uppercase tracking-widest mb-1">{activeProduct?.name || STAR_SET.name}</h4>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-widest">{activeProduct?.presentation}</p>
+                                <p className={`text-xl font-bold mt-4 tracking-tighter ${formData.paymentMethod === 'anticipado' ? 'text-gray-300 line-through' : ''}`}>{formatPrice(currentPrice, selectedCountry)}</p>
+                                {formData.paymentMethod === 'anticipado' && <p className="text-2xl font-black text-gold tracking-tighter mt-1">{formatPrice(currentPrice - discountAmount, selectedCountry)}</p>}
+                            </div>
+                        </div>
+
+                        <div className="space-y-6 pt-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Inversión Bruta</span>
+                                <span className="text-lg font-bold tracking-tight">{formatPrice(currentPrice, selectedCountry)}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Logística Maison</span>
+                                <span className={`text-[11px] font-black uppercase tracking-widest ${shippingCost === 0 ? 'text-green-600' : 'text-gray-900'}`}>
+                                    {shippingCost === 0 ? "Cortesia (Gratis)" : formatPrice(shippingCost, selectedCountry)}
+                                </span>
+                            </div>
+                            {formData.paymentMethod === 'anticipado' && (
+                                <div className="space-y-4 pt-4 border-t border-gray-100 animate-in fade-in slide-in-from-top-4 duration-700">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[10px] font-black text-gold uppercase tracking-[0.2em]">Beneficio Maison (-20%)</span>
+                                        <span className="text-lg font-black text-gold">-{formatPrice(discountAmount, selectedCountry)}</span>
+                                    </div>
+                                    <div className="bg-gold/5 p-4 border border-gold/10 rounded-sm flex justify-between items-center">
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-gold">TU AHORRO TOTAL HOY:</span>
+                                        <span className="text-xl font-black text-gold">{formatPrice(discountAmount, selectedCountry)}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="pt-12 border-t border-gray-200 space-y-4">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-luxury-black">Legado Total</p>
+                                    <span className="text-[9px] font-black text-gray-300 uppercase">{selectedCountry.currency}</span>
+                                </div>
+                                {formData.paymentMethod === 'anticipado' && (
+                                    <span className="px-3 py-1 bg-gold text-white text-[8px] font-black uppercase animate-pulse">Descuento Aplicado</span>
+                                )}
+                            </div>
+                            <p className="text-7xl font-black tracking-tighter leading-none">{formatPrice(totalPrice, selectedCountry)}</p>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-4">Incluye seguro de transporte y logística premium</p>
+                        </div>
+
+                        <div className="space-y-4 pt-10">
+                            <div className="flex items-center gap-3 opacity-40">
+                                <ShieldCheck size={14} />
+                                <span className="text-[9px] font-bold uppercase tracking-widest">Servidor 256-bit SSL Encriptado</span>
+                            </div>
+                            <div className="flex items-center gap-3 opacity-40">
+                                <Package size={14} />
+                                <span className="text-[9px] font-bold uppercase tracking-widest">Empaque de Lujo Maison Asegurado</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex justify-between items-end border-t border-gray-100 pt-10">
-                        <div><p className="premium-label text-gray-200 mb-2">Total Inversión</p><p className="text-5xl font-black tracking-tighter leading-none">{formatPrice(totalPrice, selectedCountry)}</p></div>
-                        <p className="text-[9px] font-black text-gray-200 uppercase tracking-[0.3em] mb-1">{selectedCountry.currency}</p>
+
+                    <div className="p-8 lg:p-10 bg-white border-t border-gray-200 lg:bg-transparent">
+                        <button 
+                            onClick={()=>{
+                                if(!formData.name || !formData.phone || !formData.address || !formData.reference) {
+                                    alert("Por favor, complete todos los campos obligatorios (*)");
+                                    return;
+                                }
+                                const link = getConfirmationWALink({ ...formData, phone: `${selectedCountry.dialCode}${formData.phone}`, product: activeProduct?.name || STAR_SET.name, price: formatPrice(totalPrice, selectedCountry), country: selectedCountry.name });
+                                window.open(link, '_blank');
+                            }}
+                            className="btn-premium w-full h-24 group overflow-hidden relative"
+                        > 
+                            <span className="relative z-10 flex items-center justify-center gap-4 transition-transform group-hover:scale-105">
+                                {formData.paymentMethod === 'anticipado' ? 'OBTENER CON 20% OFF' : 'CONFIRMAR PEDIDO'}
+                                <img 
+                                    src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+                                    alt="WhatsApp" 
+                                    className="w-7 h-7 brightness-0 invert"
+                                    referrerPolicy="no-referrer"
+                                />
+                            </span>
+                            <div className={`absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ${formData.paymentMethod === 'anticipado' ? 'bg-[#25D366]' : 'bg-gold'}`} />
+                        </button>
                     </div>
-                    <button 
-                        onClick={()=>{
-                            const link = getConfirmationWALink({ ...formData, product: activeProduct?.name || STAR_SET.name, price: formatPrice(totalPrice, selectedCountry), country: selectedCountry.name });
-                            window.open(link, '_blank');
-                        }}
-                        className="btn-premium h-24 flex items-center justify-center gap-4"
-                    > 
-                        CONFIRMAR PEDIDO 
-                        <img 
-                            src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
-                            alt="WhatsApp" 
-                            className="w-6 h-6 brightness-0 invert"
-                            referrerPolicy="no-referrer"
-                        />
-                    </button>
                 </div>
             </motion.div>
           </>

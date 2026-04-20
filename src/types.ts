@@ -1,6 +1,8 @@
 export interface Fragrance {
   id: string;
   name: string;
+  price: number;
+  oldPrice?: number;
   label: string;
   type: string;
   shortDesc: string;
@@ -27,6 +29,7 @@ export interface Review {
 export interface Country {
   id: string;
   name: string;
+  dialCode: string;
   currency: string;
   flag: string;
   rate: number;

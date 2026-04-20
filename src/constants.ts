@@ -4,6 +4,7 @@ export const FRAGRANCES: Fragrance[] = [
   { 
     id: "dia",
     name: "Día", 
+    price: 59900,
     label: "Energy", 
     type: "Cítrico Aromático",
     shortDesc: "Fresco y limpio para el amanecer.", 
@@ -23,6 +24,7 @@ export const FRAGRANCES: Fragrance[] = [
   { 
     id: "noche",
     name: "Noche", 
+    price: 59900,
     label: "Mystery", 
     type: "Amaderado Oriental",
     shortDesc: "Intenso y misterioso para la noche.", 
@@ -42,6 +44,7 @@ export const FRAGRANCES: Fragrance[] = [
   { 
     id: "elegante",
     name: "Elegante", 
+    price: 59900,
     label: "Power", 
     type: "Floral Amaderado",
     shortDesc: "Lujo y poder para los negocios.", 
@@ -61,6 +64,7 @@ export const FRAGRANCES: Fragrance[] = [
   { 
     id: "magnetismo",
     name: "Magnetismo", 
+    price: 59900,
     label: "Attraction", 
     type: "Especiado Cálido / Ambarino",
     shortDesc: "Atracción pura con enfoque magnético.", 
@@ -111,21 +115,21 @@ export const REVIEWS: Review[] = [
 
 export const COUNTRIES: Record<string, Country> = {
   COL: { 
-    id: "COL", name: "Colombia", currency: "COP", flag: "https://flagcdn.com/w80/co.png", rate: 1, symbol: "$",
+    id: "COL", name: "Colombia", dialCode: "+57", currency: "COP", flag: "https://flagcdn.com/w80/co.png", rate: 1, symbol: "$",
     fields: [
       { id: "dept", label: "Departamento", placeholder: "Ej: Antioquia" },
-      { id: "city", label: "Ciudad", placeholder: "Ej: Medellín" }
+      { id: "city", label: "Ciudad / Municipio", placeholder: "Ej: Medellín" }
     ]
   },
   PAN: { 
-    id: "PAN", name: "Panamá", currency: "USD", flag: "https://flagcdn.com/w80/pa.png", rate: 1 / 4000, symbol: "$",
+    id: "PAN", name: "Panamá", dialCode: "+507", currency: "USD", flag: "https://flagcdn.com/w80/pa.png", rate: 1 / 4000, symbol: "$",
     fields: [
-      { id: "prov", label: "Provincia", placeholder: "Ej: Panamá City" },
-      { id: "dist", label: "Distrito", placeholder: "Ej: San Miguelito" }
+      { id: "prov", label: "Provincia", placeholder: "Ej: Panamá" },
+      { id: "city", label: "Ciudad / Distrito", placeholder: "Ej: San Miguelito" }
     ]
   },
   CRI: { 
-    id: "CRI", name: "Costa Rica", currency: "CRC", flag: "https://flagcdn.com/w80/cr.png", rate: 0.13, symbol: "₡",
+    id: "CRI", name: "Costa Rica", dialCode: "+506", currency: "CRC", flag: "https://flagcdn.com/w80/cr.png", rate: 0.13, symbol: "₡",
     fields: [
       { id: "prov", label: "Provincia", placeholder: "Ej: San José" },
       { id: "cant", label: "Cantón", placeholder: "Ej: Escazú" },
@@ -133,10 +137,10 @@ export const COUNTRIES: Record<string, Country> = {
     ]
   },
   SLV: { 
-    id: "SLV", name: "El Salvador", currency: "USD", flag: "https://flagcdn.com/w80/sv.png", rate: 1 / 4000, symbol: "$",
+    id: "SLV", name: "El Salvador", dialCode: "+503", currency: "USD", flag: "https://flagcdn.com/w80/sv.png", rate: 1 / 4000, symbol: "$",
     fields: [
       { id: "dept", label: "Departamento", placeholder: "Ej: San Salvador" },
-      { id: "muni", label: "Municipio", placeholder: "Ej: Soyapango" }
+      { id: "muni", label: "Municipio / Ciudad", placeholder: "Ej: Soyapango" }
     ]
   }
 };
